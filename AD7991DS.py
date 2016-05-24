@@ -22,7 +22,7 @@ class Command:
 # ==================================================================
 #   AD7991DS Class Description:
 #
-#         Control of a AD7991 frequency counter
+#         Control of a AD7991 ADC
 #
 # ==================================================================
 #     Device States Description:
@@ -114,7 +114,6 @@ class AD7991DS(PyTango.Device_4Impl):
         """
         self.stopStateThreadFlag = True
         self.stateThread.join(3)
-        self.frequencyDevice.close()
 
     def unknownHandler(self, prevState):
         """Handles the UNKNOWN state, before communication with the hardware devices
@@ -124,18 +123,8 @@ class AD7991DS(PyTango.Device_4Impl):
             self.info_stream('Entering unknownHandler')
         connectionTimeout = 1.0
         self.set_status('Connecting to AD7991 through i2c bus')
-
-        # Need to connect to frequency counter, labjack,
-        # and picomotor
-
         while self.stopStateThreadFlag is False:
-            # Frequency counter:
-            try:
-                with self.streamLock:
-                    self.info_stream('Closing old device')
-                self.ad7991Device.close()
-            except:
-                pass
+            # ADC:
             try:
                 with self.streamLock:
                     self.info_stream(''.join(('Opening ad7991 device on address ', str(self.i2c_address))))
